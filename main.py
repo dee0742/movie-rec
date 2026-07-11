@@ -28,7 +28,7 @@ if not TMDB_API_KEY:
 # =========================
 # FASTAPI APP
 # =========================
-app = FastAPI(title="Movie Recommender API", version="1.0")
+app = FastAPI(title="Movie Recommender API", version="3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -123,10 +123,14 @@ async def tmdb_get(path: str, params: Dict[str, Any]) -> Dict[str, Any]:
         )
 
     if r.status_code != 200:
-        raise HTTPException(
-            status_code=502, detail=f"TMDB error {r.status_code}: {r.text}"
-        )
+      print("Status:", r.status_code)
+      print("Response:", r.text)
+      print("API KEY:", TMDB_API_KEY)
 
+      raise HTTPException(
+        status_code=r.status_code,
+        detail=r.text
+    )
     return r.json()
 
 
