@@ -1,8 +1,7 @@
 import requests
 import streamlit as st
 
-
-API_BASE = " https://movie-rec-api-htls.onrender.com"
+API_URL = "https://movie-rec-equ1.onrender.com"
 TMDB_IMG = "https://image.tmdb.org/t/p/w500"
 
 st.set_page_config(page_title="Movie Recommender", page_icon="🎬", layout="wide")
