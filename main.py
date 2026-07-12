@@ -14,17 +14,6 @@ from dotenv import load_dotenv
 # =========================
 # ENV
 # =========================
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-def root():
-    return {
-        "message": "Movie Recommendation API is running",
-        "docs": "/docs",
-        "health": "/health"
-    }
     
 load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
