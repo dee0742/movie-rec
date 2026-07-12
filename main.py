@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+
 load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
@@ -74,7 +75,9 @@ class SearchBundleResponse(BaseModel):
 
 
 def _norm_title(t: str) -> str:
-    return str(t).strip().lower()
+    cleaned = str(t).strip().lower()
+    cleaned = cleaned.replace("фм", "").replace("ў", "").replace("™", "")
+    return cleaned.strip()
 
 
 def make_img_url(path: Optional[str]) -> Optional[str]:
@@ -145,8 +148,18 @@ async def tmdb_search_movies(query: str, page: int = 1) -> Dict[str, Any]:
 async def tmdb_search_first(query: str) -> Optional[dict]:
     data = await tmdb_search_movies(query=query, page=1)
     results = data.get("results", [])
-    return results[0] if results else None
 
+    if not results:
+        return None
+
+    q = query.lower().strip()
+
+    for movie in results:
+        title = (movie.get("title") or "").lower().strip()
+        if title == q:
+            return movie
+
+    return results[0]
 
 def build_title_to_idx_map(indices: Any) -> Dict[str, int]:
     title_to_idx: Dict[str, int] = {}
@@ -165,10 +178,8 @@ def build_title_to_idx_map(indices: Any) -> Dict[str, int]:
 
 
 def get_local_idx_by_title(title: str) -> int:
-    global TITLE_TO_IDX
-    if TITLE_TO_IDX is None:
-        raise HTTPException(status_code=500, detail="TF-IDF index map not initialized")
-    key = _norm_title(title)
+    ...
+    key = _norm_title(title) # Trims and converts to lowercase
     if key in TITLE_TO_IDX:
         return int(TITLE_TO_IDX[key])
     raise HTTPException(status_code=404, detail=f"Title not found in local dataset: '{title}'")
